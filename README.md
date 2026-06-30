@@ -11,6 +11,8 @@ The repository covers SQL fundamentals as well as advanced concepts through inte
 ### 📁 SQL Assignment
 A collection of SQL assignments covering different SQL concepts and interview questions.
 
+---
+
 ### 🚢 Case_Study_Of_titanic.sql
 A complete SQL case study on the Titanic dataset including 15 interview-style business questions.
 
@@ -37,6 +39,28 @@ SQL analysis on a real-world Car Price dataset.
 - HAVING
 - Sorting
 - Business Insights
+
+---
+
+### 📱 Case_Study_Play_Store_App.sql
+A comprehensive SQL case study on the Google Play Store dataset featuring medium to advanced interview-style business questions.
+
+**Topics Covered**
+- Data Cleaning & Exploration
+- Aggregate Functions
+- GROUP BY & HAVING
+- CASE WHEN
+- Common Table Expressions (CTEs)
+- Window Functions
+- ROW_NUMBER(), RANK(), DENSE_RANK()
+- LEAD() & LAG()
+- Running Totals
+- Ranking Analysis
+- Subqueries
+- Business Dashboard Queries
+- Category-wise App Analysis
+- Free vs Paid App Analysis
+- Popularity Score Calculation
 
 ---
 
@@ -114,6 +138,9 @@ The project demonstrates SQL problem-solving using real-world business scenarios
 - DENSE_RANK()
 - LEAD()
 - LAG()
+- Running Totals
+- Business Dashboard Queries
+- Analytical SQL
 - Business Case Studies
 
 ---
