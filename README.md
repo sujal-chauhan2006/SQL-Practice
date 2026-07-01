@@ -64,6 +64,32 @@ A comprehensive SQL case study on the Google Play Store dataset featuring medium
 
 ---
 
+### 👥 Case_Study_Customer_Churn.sql
+A comprehensive SQL case study on a real-world Customer Churn dataset featuring business-oriented analytical questions commonly asked in Data Analyst, Data Scientist, and Machine Learning interviews.
+
+**Topics Covered**
+- Customer Churn Analysis
+- Revenue Loss Analysis
+- Customer Segmentation
+- Subscription Type Analysis
+- Aggregate Functions
+- GROUP BY & HAVING
+- CASE WHEN
+- Common Table Expressions (CTEs)
+- Window Functions
+- ROW_NUMBER(), RANK(), DENSE_RANK()
+- LEAD() & LAG()
+- Running Totals
+- Ranking Analysis
+- Subqueries
+- Conditional Aggregation
+- Business Dashboard Queries
+- Churn Rate Calculation
+- Customer Lifetime Insights
+- Revenue & Spend Analysis
+
+---
+
 ### 📊 GROUPBY(PRACTICE).sql
 Practice questions focused on mastering the **GROUP BY** clause.
 
@@ -139,7 +165,10 @@ The project demonstrates SQL problem-solving using real-world business scenarios
 - LEAD()
 - LAG()
 - Running Totals
+- Conditional Aggregation
 - Business Dashboard Queries
+- Customer Churn Analysis
+- Revenue Analysis
 - Analytical SQL
 - Business Case Studies
 
