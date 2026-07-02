@@ -90,6 +90,35 @@ A comprehensive SQL case study on a real-world Customer Churn dataset featuring 
 
 ---
 
+---
+
+### 🏏 Case_Study_ON_IPL.sql
+A comprehensive SQL case study on the IPL Ball-by-Ball (2008–2022) dataset featuring interview-style analytical and business-oriented SQL questions.
+
+**Topics Covered**
+- Cricket Data Analysis
+- Batting Performance Analysis
+- Bowling Performance Analysis
+- Death Overs Analysis
+- Strike Rate Calculation
+- Economy Rate Analysis
+- Dot Ball Percentage
+- Boundary Percentage
+- Aggregate Functions
+- GROUP BY & HAVING
+- CASE WHEN
+- Common Table Expressions (CTEs)
+- Window Functions
+- ROW_NUMBER(), RANK(), DENSE_RANK()
+- Running Totals
+- Player Ranking Analysis
+- Bowler vs Batsman Analysis
+- Season-wise Performance Analysis
+- Custom MVP Score Calculation
+- Business Case Studies
+
+---
+
 ### 📊 GROUPBY(PRACTICE).sql
 Practice questions focused on mastering the **GROUP BY** clause.
 
