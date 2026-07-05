@@ -13,6 +13,37 @@ A collection of SQL assignments covering different SQL concepts and interview qu
 
 ---
 
+### 🛒 Case_study_walmart.sql
+A comprehensive SQL case study on the Walmart Retail Sales dataset featuring real-world business problems and interview-style SQL questions.
+
+**Topics Covered**
+- Data Exploration
+- Sales & Profit Analysis
+- Customer Analysis
+- Product Category Analysis
+- Regional Performance Analysis
+- Aggregate Functions
+- GROUP BY & HAVING
+- CASE WHEN
+- Common Table Expressions (CTEs)
+- Window Functions
+- ROW_NUMBER(), RANK(), DENSE_RANK()
+- LEAD() & LAG()
+- Running Totals
+- Ranking Analysis
+- Top-N Queries
+- Subqueries
+- Conditional Aggregation
+- Business Dashboard Queries
+- Customer Segmentation
+- Revenue & Profit Analysis
+- Discount Analysis
+- Order Trend Analysis
+- Business Case Studies
+
+---
+---
+
 ### 🚢 Case_Study_Of_titanic.sql
 A complete SQL case study on the Titanic dataset including 15 interview-style business questions.
 
