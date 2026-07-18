@@ -257,3 +257,209 @@ ON bt.player = bw.player
 WHERE bt.player IS NULL
 
 ORDER BY MVP_SCORE DESC;
+
+DESC ball_by_ball;
+
+
+# Date : 14/7/26
+
+# Q1. Find the batsman who has hit the most sixes in IPL history.
+
+SELECT 
+	batter,
+    COUNT(batsman_run) AS total_six
+FROM ball_by_ball
+WHERE batsman_run = 6
+GROUP BY batter
+ORDER BY total_six DESC;
+
+
+# Q2. Find the top 10 batsmen with the lowest dot-ball percentage (minimum 1000 balls faced).
+
+SELECT 
+	batter,
+    COUNT(CASE
+			WHEN batsman_run = 0 THEN 1
+            ELSE 0
+		  END) AS dot_balls,
+	ROUND((COUNT(CASE
+			WHEN batsman_run = 0 THEN 1
+            ELSE 0
+		  END) / COUNT(batsman_run) )* 100) AS dot_ball_per
+FROM ball_by_ball
+GROUP BY batter
+HAVING COUNT(*) > 1000
+ORDER BY dot_balls DESC;
+
+# Q3. Find the bowler who has conceded the most boundaries (4s + 6s).
+
+SELECT
+	bowler,
+    COUNT(overs) AS total_overs,
+    SUM(
+		CASE
+			WHEN batsman_run IN (4,6) THEN 1
+            ELSE 0
+		END
+    ) AS most_boundry
+FROM ball_by_ball
+GROUP BY bowler
+ORDER BY most_boundry DESC;
+
+# Q4. Find the batsmen who have never been dismissed.
+
+SELECT 
+	batter
+FROM ball_by_ball b1
+WHERE batter NOT IN (
+	SELECT DISTINCT player_out
+	FROM ball_by_ball
+	WHERE player_out IS NOT NULL
+)
+GROUP BY batter;
+
+# Q5 Find the bowler against whom each batsman has scored the most runs.
+
+WITH cte AS (
+	 SELECT
+        batter,
+        bowler,
+        SUM(batsman_run) AS total_runs,
+        RANK() OVER (
+            PARTITION BY batter
+            ORDER BY SUM(batsman_run) DESC
+        ) AS rnk
+    FROM ball_by_ball
+    GROUP BY batter, bowler
+)
+SELECT 
+	batter,
+	bowler,
+    total_runs
+FROM cte
+WHERE rnk = 1
+ORDER BY total_runs DESC;
+
+# Q6. Find the batting team's highest scoring over in IPL history.
+
+SELECT 
+	ID AS MatchID,
+    innings,
+    overs,
+    BattingTeam,
+    SUM(batsman_run) AS total_runs
+FROM ball_by_ball
+GROUP BY innings,overs,BattingTeam
+ORDER BY total_runs DESC;
+
+# Q7. Which batsman has scored runs against the largest number of different bowlers?
+
+SELECT 
+	batter,
+    COUNT(distinct bowler) AS Unique_Bowler_Faced
+FROM ball_by_ball
+GROUP BY batter;
+
+# Q8. Find the top 10 batsmen with the highest batting average.
+
+SELECT
+    batter,
+    SUM(batsman_run) AS total_runs,
+    COUNT(player_out) AS total_outs,
+    ROUND(
+        SUM(batsman_run) / COUNT(player_out),
+        2
+    ) AS batting_average
+FROM ball_by_ball
+GROUP BY batter
+HAVING COUNT(player_out) > 0
+ORDER BY batting_average DESC
+LIMIT 10;
+
+# Q9. Find the bowlers who have taken wickets in the highest number of different matches.
+
+SELECT 
+	bowler,
+    isWicketDelivery,
+    COUNT(distinct ID) AS match_with_wicket
+FROM ball_by_ball
+GROUP BY bowler
+HAVING isWicketDelivery = 1;
+
+# Q10. Find the batsman who scored the fastest fifty.
+
+WITH runs_cte AS (
+    SELECT
+        ID,
+        innings,
+        batter,
+        overs,
+        ballnumber,
+        batsman_run,
+
+        SUM(batsman_run) OVER (
+            PARTITION BY ID, innings, batter
+            ORDER BY overs, ballnumber
+        ) AS running_runs,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY ID, innings, batter
+            ORDER BY overs, ballnumber
+        ) AS balls_faced
+
+    FROM ball_by_ball
+),
+
+fifty_cte AS (
+    SELECT
+        ID,
+        innings,
+        batter,
+        balls_faced,
+        running_runs,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY ID, innings, batter
+            ORDER BY balls_faced
+        ) AS rn
+
+    FROM runs_cte
+    WHERE running_runs >= 50
+)
+
+SELECT
+    batter,
+    ID AS MatchID,
+    innings,
+    balls_faced AS Balls_to_Fifty
+FROM fifty_cte
+WHERE rn = 1
+ORDER BY Balls_to_Fifty
+LIMIT 1;
+
+# Q11. Find the bowler who has bowled the most balls without taking a wicket.
+
+SELECT
+	bowler,
+    COUNT(*) AS total_balls,
+    SUM(CASE
+			WHEN isWicketDelivery = 1 AND
+            kind NOT IN ('run out', 'retired hurt') THEN 1
+            ELSE 0
+		END 
+        ) AS Wicket
+FROM ball_by_ball
+GROUP BY bowler
+HAVING Wicket = 0
+ORDER BY total_balls DESC;
+
+# Q12. Find the top 10 highest-scoring partnerships.
+
+SELECT
+	batter,
+    `non-striker`,
+    SUM(batsman_run) AS total_runs
+FROM ball_by_ball
+GROUP BY batter,`non-striker`
+ORDER BY total_runs DESC;
+
