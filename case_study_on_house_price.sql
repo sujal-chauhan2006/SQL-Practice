@@ -218,3 +218,133 @@ WHERE rn IN (
     (total_rows + 1) / 2,
     (total_rows + 2) / 2
 );
+
+# Q22. Find the 5 most expensive locations based on average property price.
+
+SELECT
+	location,
+    AVG(price_in_cr) AS avg_price
+FROM ahmendabad_house_price
+GROUP BY location
+ORDER BY avg_price DESC
+LIMIT 5;
+
+# Q23. Find the most expensive property for each BHK type.
+
+SELECT 
+	name,
+	bhk_type,
+    price_in_cr,
+    ROW_NUMBER() OVER(PARTITION BY bhk_type ORDER BY price_in_cr DESC) AS rnk
+FROM ahmendabad_house_price;
+
+# Q24. Find the cheapest property in every location.
+
+SELECT 
+	location,
+    MIN(price_in_cr) OVER(PARTITION BY location ORDER BY price_in_cr) chepest_property_price
+    
+FROM ahmendabad_house_price;
+
+# Q25. Find locations where the average rate per sqft is higher than the overall average rate per sqft.
+
+SELECT 
+	location,
+    AVG(rate_per_sqft) AS avg_rate
+FROM ahmendabad_house_price
+GROUP BY location
+HAVING avg_rate > (
+	SELECT AVG(rate_per_sqft) FROM ahmendabad_house_price
+);
+
+# Q26. Find the percentage of properties in each property type.
+
+SELECT
+	name,
+    property_type,
+	ROUND((COUNT(*)) * 100 / SUM(COUNT(*)) OVER(),2) AS percentage
+FROM ahmendabad_house_price
+GROUP BY property_type;
+
+# Q27. Find outlier properties whose price is more than twice the average price of their location.
+
+WITH CTE AS (
+	SELECT
+		name,
+		location,
+		ROUND(AVG(price_in_cr),2) as avg_price_per_locations
+	FROM ahmendabad_house_price
+    GROUP BY location
+)
+SELECT 
+	a.name,
+    a.location,
+    a.price_in_cr,
+    c.avg_price_per_locations
+FROM ahmendabad_house_price a
+INNER JOIN CTE c
+ON a.location = c.location
+WHERE a.price_in_cr > 2 * c.avg_price_per_locations;
+
+# Q29. Find the most common property type in every location.
+
+SELECT
+	name ,
+    location,
+    COUNT(*) AS number_of_property
+FROM ahmendabad_house_price
+GROUP BY name
+HAVING COUNT(*) > 20
+ORDER BY number_of_property DESC;
+
+# Q30. Find the location where the average property price increased 
+-- the most compared to the previous location after sorting alphabetically.
+
+WITH CTE AS (
+SELECT
+    location,
+    ROUND(AVG(price_in_cr),2) as avg_price
+FROM ahmendabad_house_price
+GROUP BY location
+)
+SELECT 
+    location,
+    avg_price,
+    ROUND(
+			(avg_price) - 
+			(LAG(avg_price) OVER(ORDER BY location DESC))
+		,2) AS difference
+FROM CTE
+ORDER BY location ASC;
+
+# Q31.
+
+-- Find the Top 5 locations that have:
+-- Highest average price
+-- More than 10 properties
+
+SELECT 
+	location,
+    COUNT(*) AS no_of_property,
+    ROUND(AVG(price_in_cr),2) AS avg_price
+FROM ahmendabad_house_price
+GROUP BY location
+HAVING COUNT(*) > 10
+ORDER BY avg_price,no_of_property DESC
+LIMIT 5;
+
+# Q32. Find all luxury properties where the rate per sqft is below the city average.
+
+SELECT 
+	location,
+    rate_per_sqft,
+    price_in_cr
+FROM ahmendabad_house_price 
+WHERE price_in_cr > (
+	SELECT AVG(price_in_cr) FROM ahmendabad_house_price
+) AND rate_per_sqft <
+(
+	SELECT AVG(rate_per_sqft) FROM ahmendabad_house_price
+)
+
+
