@@ -345,6 +345,104 @@ WHERE price_in_cr > (
 ) AND rate_per_sqft <
 (
 	SELECT AVG(rate_per_sqft) FROM ahmendabad_house_price
+);
+
+# 33 Top 3 Most Expensive Properties in Each Location
+WITH CTE AS (
+SELECT 
+	location,
+    price_in_cr,
+    ROW_NUMBER() OVER(PARTITION BY location ORDER BY price_in_cr DESC) AS rnk
+FROM ahmendabad_house_price
 )
+SELECT
+	*
+FROM CTE
+WHERE rnk <= 3;
 
+# Q34. Luxury but Undervalued Properties
 
+SELECT 
+	location,
+    rate_per_sqft,
+    price_in_cr
+FROM ahmendabad_house_price
+WHERE price_in_cr > (SELECT AVG(price_in_cr) FROM ahmendabad_house_price) AND
+rate_per_sqft < (SELECT AVG(rate_per_sqft) FROM ahmendabad_house_price);
+
+# Q35 Most Common BHK in Each Location
+
+SELECT
+    location,
+    bhk_type,
+    COUNT('bhk_type') AS no_of_bhk,
+    ROW_NUMBER() OVER(PARTITION BY location ORDER BY COUNT('bhk_type') DESC) as rnk
+FROM ahmendabad_house_price
+GROUP BY location,bhk_type
+HAVING COUNT('bhk_type') > 10;
+
+# Q36 Locations with More Than 70% Flats
+
+SELECT
+	location,
+    ROUND(
+		SUM(CASE WHEN property_type = 'flat' THEN 1 ELSE 0 END) * 100 
+        / COUNT(*) 
+	,2) AS per
+FROM ahmendabad_house_price
+GROUP BY location
+HAVING per > 70
+ORDER BY per ASC;
+
+# Q37 Average Price Difference Between Flats and Land
+
+SELECT 
+	location,
+    property_type,
+	ROUND(AVG(CASE 
+		WHEN property_type = 'flat' THEN price_in_cr
+	END) - 
+    AVG(CASE 
+		WHEN property_type = 'land' THEN price_in_cr
+	END),2) AS difference
+FROM ahmendabad_house_price
+WHERE property_type IN ('flat','land')
+GROUP BY location;
+
+# Q38 Find the property having the highest price per BHK.
+
+SELECT
+	location,
+    ROUND(
+		price_in_cr / bhk_type
+    ,2) AS price_per_bhk
+FROM ahmendabad_house_price
+ORDER BY price_per_bhk DESC
+LIMIT 1;
+
+# Q39 Second Cheapest Property in Every Location.
+
+WITH CTE AS (
+SELECT
+	location,
+    price_in_cr,
+    DENSE_RANK() OVER(PARTITION BY location ORDER BY price_in_cr ASC) AS rnk
+FROM ahmendabad_house_price
+)
+SELECT 
+	location,
+    price_in_cr
+FROM CTE
+WHERE rnk = 2;
+
+# Q40 Huge Price Difference
+-- Find locations where
+-- MAX(price) >= 3 × MIN(price)
+
+SELECT 
+	location,
+    MAX(price_in_cr) as expensive_house,
+    MIN(price_in_cr) AS chepest_house
+FROM ahmendabad_house_price
+GROUP BY location
+HAVING MAX(price_in_cr) >= MIN(price_in_cr) * 3;
