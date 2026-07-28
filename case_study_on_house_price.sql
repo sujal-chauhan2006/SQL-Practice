@@ -446,3 +446,126 @@ SELECT
 FROM ahmendabad_house_price
 GROUP BY location
 HAVING MAX(price_in_cr) >= MIN(price_in_cr) * 3;
+
+-- Date :- 28-07-26
+
+# Q41 Find the location having the smallest difference between 
+-- its highest-priced and lowest-priced property.
+
+SELECT 
+	location,
+    ROUND(
+		MAX(price_in_cr) - MIN(price_in_cr)
+    ,2) AS diff
+FROM ahmendabad_house_price
+GROUP BY location
+ORDER BY diff ASC
+LIMIT 1;
+
+# Q42 Find the most expensive property in each location that is priced above its location's average price.
+
+WITH cte AS (
+    SELECT
+        name,
+        location,
+        price_in_cr,
+        AVG(price_in_cr) OVER(PARTITION BY location) AS avg_price,
+        ROW_NUMBER() OVER(
+            PARTITION BY location
+            ORDER BY price_in_cr DESC
+        ) AS rn
+    FROM ahmendabad_house_price
+)
+SELECT
+    location,
+    name,
+    price_in_cr
+FROM cte
+WHERE price_in_cr > avg_price
+AND rn = 1;
+
+# Q43 Sort properties by price and calculate the difference between each property and the previous property's price.
+
+SELECT
+	location,
+    price_in_cr,
+    ROUND(
+		price_in_cr - LAG(price_in_cr) OVER(ORDER BY price_in_cr)
+    ,2) AS diff
+FROM ahmendabad_house_price
+ORDER BY price_in_cr DESC;
+
+# Q44 Find locations where the average price is higher than the overall average price and 
+-- the average area is also higher than the overall average area.
+
+SELECT 
+	location,
+    price_in_cr,
+    AVG(price_in_cr) AS avg_price,
+    AVG(area_in_sqft) AS avg_area
+FROM ahmendabad_house_price
+GROUP BY location
+HAVING AVG(price_in_cr) > (SELECT AVG(price_in_cr) FROM ahmendabad_house_price) 
+AND
+AVG(area_in_sqft) > (SELECT AVG(area_in_sqft) FROM ahmendabad_house_price); 
+
+# Q45 Rank properties within each property type based on price.
+
+SELECT
+	location,
+	property_type,
+    price_in_cr,
+    DENSE_RANK() OVER(PARTITION BY property_type ORDER BY price_in_cr DESC) AS rnk
+FROM ahmendabad_house_price;
+
+# Q46 First find the top 5 locations by total property value. 
+-- Then find the cheapest property in each of those locations.
+WITH top_locations AS (
+    SELECT
+        location
+    FROM ahmendabad_house_price
+    GROUP BY location
+    ORDER BY SUM(price_in_cr) DESC
+    LIMIT 5
+)
+
+SELECT
+    a.location,
+    MIN(a.price_in_cr) AS cheapest_property
+FROM ahmendabad_house_price a
+JOIN top_locations t
+ON a.location = t.location
+GROUP BY a.location;
+
+# Q 47 Find all properties whose price is at least 1.5 times the average price of their location.
+WITH CTE AS (
+    SELECT
+        location,
+        AVG(price_in_cr) AS avg_price
+    FROM ahmendabad_house_price
+    GROUP BY location
+)
+
+SELECT
+    a.location,
+    a.name,
+    a.price_in_cr,
+    c.avg_price
+FROM ahmendabad_house_price a
+JOIN CTE c
+ON a.location = c.location
+WHERE a.price_in_cr >= c.avg_price * 1.5;
+
+# Q48 Calculate what percentage each property's price contributes to the total property value of its location.
+
+SELECT
+	location,
+    price_in_cr,
+    ROUND(
+		price_in_cr -
+		(SUM(price_in_cr) OVER(PARTITION BY location)) * 100
+    ,2) AS per
+FROM ahmendabad_house_price
+ORDER BY per DESC;
+
+
